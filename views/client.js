@@ -56,7 +56,7 @@ socket.on("activeSessions", (users) => {
   }
 });
 
-socket.on("sendMessage", ({ message, user, image }) => {
+("sendMessage", ({ message, user, image }) => {
   printMessages.insertAdjacentHTML(
     "beforeend",
     `<div class="message frnd_message"><p>${message}<br /><span>${user}</span></p></div>`
@@ -65,7 +65,7 @@ socket.on("sendMessage", ({ message, user, image }) => {
     const imagen = document.createElement("img");
     imagen.src = image;
     printMessages.appendChild(imagen);
-  }
+  }socket.on
   printMessages.scrollTop = printMessages.scrollHeight;
 });
 
@@ -83,44 +83,31 @@ btnrRegisterUser.addEventListener("click", () => {
 });
 
 btnSendMessage.addEventListener("click", () => {
-  if (fileURL != undefined) {
-    if (txtUserMessage.value.startsWith("-private:")) {
-      const selectUser = txtUserMessage.value.split(" ")[1];
-      const message = txtUserMessage.value.substr(selectUser.length + 10);
-      socket.emit("sendMessagesPrivate", {
-        message,
-        image: fileURL,
-        selectUser,
-      });
-    } else {
-      socket.emit("sendMessage", {
-        message: txtUserMessage.value.trim(),
-        image: fileURL,
-      });
-    }
-  } else {
-    if (txtUserMessage.value.trim() != "") {
-      if (txtUserMessage.value.startsWith("-private:")) {
-        const selectUser = txtUserMessage.value.split(" ")[1];
-        const message = txtUserMessage.value.substr(selectUser.length + 10);
-        socket.emit("sendMessagesPrivate", {
-          message,
-          image: fileURL,
-          selectUser,
-        });
-      } else {
-        socket.emit("sendMessage", {
-          message: txtUserMessage.value.trim(),
-          image: fileURL,
-        });
-      }
-    }
-  }
+    if (txtUserMessage.value.trim() === "") return; // No enviar mensajes vacíos
 
-  txtUserMessage.value = "";
-  fileURL = undefined;
-  printMessages.scrollTop = printMessages.scrollHeight;
+    let message = txtUserMessage.value.trim();
+    let isPrivate = message.startsWith("-private:");
+    let selectUser = null;
+
+    if (isPrivate) {
+        const parts = message.split(" ");
+        selectUser = parts[1];
+        message = message.substr(selectUser.length + 10); // Extrae el mensaje real
+    }
+
+    // Enviar el mensaje al servidor (público o privado)
+    if (isPrivate) {
+        socket.emit("sendMessagesPrivate", { message, image: fileURL, selectUser });
+    } else {
+        socket.emit("sendMessage", { message, image: fileURL });
+    }
+
+    // Limpiar input y resetear imagen adjunta
+    txtUserMessage.value = "";
+    fileURL = undefined;
 });
+
+
 
 txtUserMessage.addEventListener("keypress", function (e) {
   if (e.key === "Enter") {
@@ -180,17 +167,37 @@ userFile.addEventListener("change", (e) => {
     : alert("Foto adjunta, lista para enviar.");
 });
 
+socket.on("sendMessage", ({ message, user, image }) => {
+    printMessages.insertAdjacentHTML(
+        "beforeend",
+        `<div class="message frnd_message"><p>${message}<br /><span>${user}</span></p></div>`
+    );
+
+    if (image) {
+        const img = document.createElement("img");
+        img.src = image;
+        printMessages.appendChild(img);
+    }
+
+    printMessages.scrollTop = printMessages.scrollHeight;
+});
+
 socket.on("loadMessages", (messages) => {
+    console.log("📥 Cargando mensajes guardados:", messages); // Depuración en consola
+
     messages.forEach(({ user, message, image }) => {
         printMessages.insertAdjacentHTML(
             "beforeend",
             `<div class="message frnd_message"><p>${message}<br /><span>${user}</span></p></div>`
         );
+
         if (image) {
             const img = document.createElement("img");
             img.src = image;
             printMessages.appendChild(img);
         }
     });
-    printMessages.scrollTop = printMessages.scrollHeight;
+
+    printMessages.scrollTop = printMessages.scrollHeight; // Desplazar hacia abajo
 });
+
