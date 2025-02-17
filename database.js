@@ -18,6 +18,7 @@ db.run(`CREATE TABLE IF NOT EXISTS messages (
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 )`);
 
+// Función para guardar mensajes en la base de datos
 const saveMessage = (user, message, image) => {
     db.run("INSERT INTO messages (user, message, image) VALUES (?, ?, ?)", 
         [user, message, image], 
@@ -38,4 +39,4 @@ const getMessages = (callback) => {
     });
 };
 
-module.exports = { saveMessage, getMessages };
+module.exports = { db, saveMessage, getMessages };

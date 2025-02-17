@@ -6,7 +6,7 @@ const path = require("path");
 const PORT = process.env.PORT || 8000;
 const list_users = {};
 
-const { saveMessage, getMessages } = require("./database");
+const { db, saveMessage, getMessages } = require("./database");
 
 app.use(express.static(path.join(__dirname, "views")));
 
@@ -69,4 +69,17 @@ io.on("connection", (socket) => {
             socket.emit("errorMessage", "El usuario al que intentas enviar el mensaje no existe.");
         }
     });
+
+    socket.on("clearMessages", () => {
+        console.log("🗑️ Recibido 'clearMessages'. Eliminando todos los mensajes...");
+        db.run("DELETE FROM messages", (err) => {
+            if (err) {
+                console.error("❌ Error al borrar mensajes:", err.message);
+            } else {
+                console.log("✅ Todos los mensajes han sido eliminados de la base de datos.");
+                io.emit("messagesCleared"); // Avisar a todos los clientes
+            }
+        });
+    });
+    
 });

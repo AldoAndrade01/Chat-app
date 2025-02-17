@@ -19,6 +19,9 @@ const userFile = document.querySelector("#userFile");
 const btnrRegisterUser = document.querySelector("#registerUser");
 const btnSendMessage = document.querySelector("#sendMessage");
 const btnSendFile = document.querySelector("#sendFile");
+const btnToggleOptions = document.querySelector("#toggleOptions");
+const optionsContainer = document.querySelector("#optionsContainer");
+const btnClearMessages = document.querySelector("#clearMessages");
 
 //  Print
 const printUsersActive = document.querySelector("#usersActive");
@@ -201,3 +204,27 @@ socket.on("loadMessages", (messages) => {
     printMessages.scrollTop = printMessages.scrollHeight; // Desplazar hacia abajo
 });
 
+// Alternar la visibilidad del menú de opciones (botón de borrar)
+btnToggleOptions.addEventListener("click", () => {
+  if (optionsContainer.style.display === "none") {
+      optionsContainer.style.display = "block";
+  } else {
+      optionsContainer.style.display = "none";
+  }
+});
+
+// Función para borrar los mensajes
+btnClearMessages.addEventListener("click", () => {
+  if (confirm("⚠️ ¿Seguro que quieres borrar todos los mensajes? Esta acción no se puede deshacer.")) {
+      console.log("📤 Enviando evento 'clearMessages' al servidor...");
+      socket.emit("clearMessages"); // Enviar evento al servidor
+      optionsContainer.style.display = "none"; // Ocultar después de usarlo
+  }
+});
+
+// Escuchar evento del servidor para limpiar el chat en todos los clientes
+socket.on("messagesCleared", () => {
+  console.log("✅ Mensajes eliminados. Recibido 'messagesCleared' del servidor.");
+  printMessages.innerHTML = ""; // Vaciar mensajes en el cliente
+  alert("🗑️ Todos los mensajes han sido eliminados.");
+});

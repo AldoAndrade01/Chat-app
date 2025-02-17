@@ -179,8 +179,15 @@
             </div>
             <ul class="nav_icons">
               <li><ion-icon name="search-outline"></ion-icon></li>
-              <li><ion-icon name="ellipsis-vertical"></ion-icon></li>
+              <li id="toggleOptions"><ion-icon name="ellipsis-vertical"></ion-icon></li>
             </ul>
+          </div>
+
+          <!-- Contenedor del botón con clase para posición -->
+          <div id="optionsContainer" style="display: none; position: absolute; right: 10px; top: 60px; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 10;">
+            <button id="clearMessages" class="bg-red-500 text-white px-4 py-2 rounded-lg">
+                🗑️ Borrar mensajes
+            </button>
           </div>
 
           <div class="chatBox" id="messages">
